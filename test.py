@@ -55,7 +55,6 @@ def main():
         display_vehicle_count(img, vehicle_count, model.names, color=COLORRED)
 
         cv2.imshow("Image", img)
-        #### TODO: ask Mickael about 0xFF
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
