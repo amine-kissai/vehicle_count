@@ -1,1 +1,1 @@
-Hello world!
+This is a personnal project of cvehicle counting within a specified line in a video stream, somewhat emulating real life induction loops.
