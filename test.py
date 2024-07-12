@@ -61,9 +61,7 @@ def main():
     cap.release()
     cv2.destroyAllWindows()
 
-    #TODO : code for better plotting, and maybe irt plotting
-    plt.plot(vehicle_count.values())
-    plt.show()
+    plot_vehicle_pie_chart(vehicle_count)
 
 
 if __name__ == "__main__":
