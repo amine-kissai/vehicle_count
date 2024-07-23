@@ -7,29 +7,27 @@ import cv2
 
 from utils import *
 from constants import *
+from cv_utils import *
 
 
 
 def main():
-    # Creating cam object
-    cap = cv2.VideoCapture("videos/cars.mp4")
 
     # Setting up the YOLO model
     model = YOLO("yolo_weights/yolov8l.pt")
 
     # Setting up the mask
-    mask = cv2.imread("mask.png")
+    mask = cv2.imread("masks/mask.png")
 
     vehicle_count = defaultdict(int)
 
     counted_ids = set()
 
 
-    while cap.isOpened():
+    with video_capture("videos/cars.mp4") as cap:
         success, img = cap.read()
         if not success:
-            print("Failed to read frame. Exiting...")
-            break
+            raise ValueError("Failed to read frame. Exiting...")
 
         imgRegion = cv2.bitwise_and(img, mask)
         # Setting up the line for the counting
@@ -55,11 +53,8 @@ def main():
         display_vehicle_count(img, vehicle_count, model.names, color=COLORRED)
 
         cv2.imshow("Image", img)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+    cv2.waitKey(1)
 
-    cap.release()
-    cv2.destroyAllWindows()
 
     plot_vehicle_pie_chart(vehicle_count)
 
