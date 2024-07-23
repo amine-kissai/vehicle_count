@@ -1,24 +1,32 @@
-import math
-from collections import defaultdict
-
 import matplotlib.pyplot as plt
 from ultralytics import YOLO
 import cv2
 
-from utils import *
-from constants import *
+import math
+from collections import defaultdict
+import argparse
+
+from utils import plot_vehicle_pie_chart, parse_args
+from constants import COLORBLACK, COLORGREEN, COLORRED
+from cv_utils import user_typed_q, apply_mask, track_vehicles, draw_rect, is_crossing_line, display_vehicle_count
 
 
 
 def main():
+    # Parse input args
+    args = parse_args()
+
     # Creating cam object
-    cap = cv2.VideoCapture("videos/cars.mp4")
+    cap = cv2.VideoCapture(args.video)
 
     # Setting up the YOLO model
     model = YOLO("yolo_weights/yolov8l.pt")
 
     # Setting up the mask
-    mask = cv2.imread("masks/mask.png")
+    mask = cv2.imread(args.mask)
+
+    # Setting up the line limits
+    line_limits = [(args.line[0], args.line[1]), (args.line[2], args.line[3])]
 
     vehicle_count = defaultdict(int)
 
@@ -31,7 +39,7 @@ def main():
             print("Failed to read frame. Exiting...")
             break
 
-        imgRegion = cv2.bitwise_and(img, mask)
+        imgRegion = apply_mask(img, mask)
         # Setting up the line for the counting
         cv2.line(img, line_limits[0], line_limits[1], COLORRED, 5)
 
@@ -55,7 +63,7 @@ def main():
         display_vehicle_count(img, vehicle_count, model.names, color=COLORRED)
 
         cv2.imshow("Image", img)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if user_typed_q():
             break
 
     cap.release()

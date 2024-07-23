@@ -15,8 +15,10 @@ vehicle_classes = [1, 2, 3, 5, 7]
 
 ### Boundaries
 line_limits = [(400, 297), (673, 297)]
+line_limits2 = [(310, 550), (1020, 550)]
+
 
 ### Colors
 COLORBLACK = (0,0,0)
 COLORRED = (0,0,255)
-COLORGREEN = (255,0,0)
+COLORGREEN = (0,255,0)

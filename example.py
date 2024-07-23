@@ -1,37 +1,41 @@
-import math
-from collections import defaultdict
-
 import matplotlib.pyplot as plt
 from ultralytics import YOLO
 import cv2
 
-from utils import *
-from constants import *
-from cv_utils import *
+import math
+from collections import defaultdict
+
+from utils import plot_vehicle_pie_chart
+from constants import COLORBLACK, COLORGREEN, COLORRED, line_limits2
+from cv_utils import user_typed_q, apply_mask, track_vehicles, draw_rect, is_crossing_line, display_vehicle_count
+
 
 
 
 def main():
+    # Creating cam object
+    cap = cv2.VideoCapture("videos/cars2.mp4")
 
     # Setting up the YOLO model
     model = YOLO("yolo_weights/yolov8l.pt")
 
     # Setting up the mask
-    mask = cv2.imread("masks/mask.png")
+    mask = cv2.imread("masks/mask2.png")
 
     vehicle_count = defaultdict(int)
 
     counted_ids = set()
 
 
-    with video_capture("videos/cars.mp4") as cap:
+    while cap.isOpened():
         success, img = cap.read()
         if not success:
-            raise ValueError("Failed to read frame. Exiting...")
+            print("Failed to read frame. Exiting...")
+            break
 
         imgRegion = cv2.bitwise_and(img, mask)
         # Setting up the line for the counting
-        cv2.line(img, line_limits[0], line_limits[1], COLORRED, 5)
+        cv2.line(img, line_limits2[0], line_limits2[1], COLORRED, 5)
 
         # Track vehicles
         results = track_vehicles(model, imgRegion)
@@ -45,16 +49,19 @@ def main():
                 draw_rect(img=img, boundaries=(x1, y1, w, h), conf=conf, cls=model.names[cls], color=COLORBLACK)
                 if box.id :
                     track_id = int(box.id[0])
-                    if track_id not in counted_ids and is_crossing_line((x1, y1, x2, y2), line_limits):
+                    if track_id not in counted_ids and is_crossing_line((x1, y1, x2, y2), line_limits2):
                         counted_ids.add(track_id)
                         vehicle_count[cls] += 1
-                        cv2.line(img, line_limits[0], line_limits[1], COLORGREEN, 5)
+                        cv2.line(img, line_limits2[0], line_limits2[1], COLORGREEN, 5)
         # Display vehicle counts
         display_vehicle_count(img, vehicle_count, model.names, color=COLORRED)
 
         cv2.imshow("Image", img)
-    cv2.waitKey(1)
+        if user_typed_q():
+            break
 
+    cap.release()
+    cv2.destroyAllWindows()
 
     plot_vehicle_pie_chart(vehicle_count)
 

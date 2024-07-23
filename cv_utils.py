@@ -35,10 +35,8 @@ def video_capture(path:str):
     cap = cv2.VideoCapture(path)
     try:
         yield cap
-        cv2.waitKey(1)
     finally:
         cap.release()
-        cv2.destroyAllWindows()
 
 @contextmanager
 def destroy_all_window_on_exit():
